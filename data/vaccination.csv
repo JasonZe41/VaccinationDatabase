@@ -1,0 +1,21 @@
+VaccineID,Name,CompanyID,Type,DosesRequired,StorageRequirements
+1,COVID-19 Vaccine A,1,mRNA,2,-70°C
+2,Flu Vaccine B,2,Inactivated,1,2-8°C
+3,Hepatitis B Vaccine C,3,Recombinant,3,2-8°C
+4,COVID-19 Vaccine D,4,Vector,2,2-8°C
+5,Tetanus Vaccine E,5,Toxoid,1,2-8°C
+6,MMR Vaccine F,6,Live-attenuated,2,-20°C
+7,Polio Vaccine G,7,Inactivated,4,2-8°C
+8,HPV Vaccine H,8,Recombinant,3,2-8°C
+9,Chickenpox Vaccine I,9,Live-attenuated,2,-20°C
+10,Shingles Vaccine J,10,Recombinant,2,2-8°C
+11,Rabies Vaccine K,11,Inactivated,5,2-8°C
+12,Pneumococcal Vaccine L,12,Conjugate,1,2-8°C
+13,Rotavirus Vaccine M,13,Live-attenuated,2,-20°C
+14,Meningococcal Vaccine N,14,Conjugate,1,2-8°C
+15,Typhoid Vaccine O,15,Inactivated,1,2-8°C
+16,Yellow Fever Vaccine P,16,Live-attenuated,1,2-8°C
+17,Dengue Vaccine Q,17,Recombinant,3,-20°C
+18,Cholera Vaccine R,18,Inactivated,2,2-8°C
+19,Japanese Encephalitis S,5,Inactivated,2,2-8°C
+20,Hepatitis A Vaccine T,6,Inactivated,2,2-8°C
