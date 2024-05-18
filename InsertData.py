@@ -8,9 +8,9 @@ def create_connection(host_name, user_name, user_password):
     connection = None
     try:
         connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="7543XDBxcy",
+            host=host_name,
+            user=user_name,
+            password=user_password,
             database="VaccinationRecord"
         )
         print("Connection to MySQL DB successful")
@@ -53,15 +53,16 @@ def insert_data_from_csv(connection, table_name, csv_file, columns, date_columns
 # Database connection details
 host_name = "localhost"
 user_name = "root"
-user_password = "7543XDBxcy"
+# enter password for MySQLWorkbench
+user_password = ""
 
 # Connect to MySQL server
 connection = create_connection(host_name, user_name, user_password)
 
 # Create database if it doesn't exist
-execute_query(connection, "DROP database IF EXISTS VaccinationRecord;")
-execute_query(connection, "CREATE DATABASE IF NOT EXISTS VaccinationRecord;")
-execute_query(connection, "USE VaccinationRecord;")
+# execute_query(connection, "DROP database IF EXISTS VaccinationRecord;")
+# execute_query(connection, "CREATE DATABASE IF NOT EXISTS VaccinationRecord;")
+# execute_query(connection, "USE VaccinationRecord;")
 
 # Create tables
 patients_table = """
