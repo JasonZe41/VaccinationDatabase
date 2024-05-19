@@ -26,6 +26,11 @@ layout = [
             [sg.Radio("Find all patients who have received <vaccine name>", "QUERY", key="Q1", enable_events=True)],
             [sg.Radio("Retrieve vaccination history for <patient name>", "QUERY", key="Q2", enable_events=True)],
             [sg.Radio("Find patients due for their 2nd dose or booster shot of a vaccine", "QUERY", key="Q3", enable_events=True)],
+            [sg.Radio("List all vaccines that require ultra-cold storage", "QUERY", key="Q5", enable_events=True)],
+            [sg.Radio("Determine the quantity of vaccines needed to reorder for each pharmacy", "QUERY", key="Q6", enable_events=True)],
+            [sg.Radio("Show upcoming vaccination appointments by date", "QUERY", key="Q7", enable_events=True)],
+            [sg.Radio("Find the total number of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q8", enable_events=True)],
+            [sg.Radio("Find the total number of different types of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q9", enable_events=True)],
             [sg.Text("Enter additional input if required in `<...>`:")],
             [sg.InputText(key="INPUT", size=(30, 1))],
             [sg.Button("Run Query"), sg.Button("Exit")]
@@ -92,12 +97,49 @@ while True:
                 " JOIN Vaccinations v ON vr.vaccine_id = v.vaccine_id " \
                 " GROUP BY p.patient_id, vr.vaccine_id, v.doses_required " \
                 " HAVING COUNT(vr.record_id) < v.doses_required;"
+        
+        elif values["Q5"]:
+            intro_line = "List of vaccines that require ultra-cold storage: \n"
+            selected_query = "SELECT name FROM Vaccinations WHERE storage_requirements = 'Ultra-cold';"
+
+        elif values["Q6"]:
+            intro_line = "Quantity of vaccines needed to reorder for each pharmacy: \n [Pharmacy, Vaccine, QuantityAvailable, QuantityAdministered]\n"
+            selected_query = "SELECT pm.name AS PharmacyName, v.name AS VaccineName, im.quantity_available, im.quantity_administered " \
+                             "FROM Inventory im " \
+                             "JOIN Pharmacies pm ON im.pharmacy_id = pm.pharmacy_id " \
+                             "JOIN Vaccinations v ON im.vaccine_id = v.vaccine_id " \
+                             "WHERE im.quantity_available < im.quantity_administered;"
+
+        elif values["Q7"]:
+            intro_line = "Upcoming vaccination appointments by date: \n [AppointmentDate, Patient, Vaccine]\n"
+            selected_query = "SELECT va.appointment_date, CONCAT(p.first_name, ' ', p.last_name) AS PatientName, v.name AS VaccineName " \
+                             "FROM VaccinationAppointments va " \
+                             "JOIN Patients p ON va.patient_id = p.patient_id " \
+                             "JOIN Vaccinations v ON va.vaccine_id = v.vaccine_id " \
+                             "WHERE va.status = 1 " \
+                             "ORDER BY va.appointment_date;"
+
+
+        elif values["Q8"]:
+            intro_line = "Total number of vaccines administered by each Vaccination Caregiver: \n [Caregiver, TotalVaccinesAdministered]\n"
+            selected_query = "SELECT CONCAT(c.first_name, ' ', c.last_name) AS CaregiverName, COUNT(vr.record_id) AS TotalVaccinesAdministered " \
+                             "FROM Caregivers c " \
+                             "JOIN VaccinationRecords vr ON c.caregiver_id = vr.caregiver_id " \
+                             "GROUP BY c.caregiver_id;"
+
+        elif values["Q9"]:
+            intro_line = "Total number of different types of vaccines administered by each Vaccination Caregiver: \n [Caregiver, TotalTypesOfVaccines]\n"
+            selected_query = "SELECT CONCAT(c.first_name, ' ', c.last_name) AS CaregiverName, COUNT(DISTINCT vr.vaccine_id) AS TotalTypesOfVaccines " \
+                             "FROM Caregivers c " \
+                             "JOIN VaccinationRecords vr ON c.caregiver_id = vr.caregiver_id " \
+                             "GROUP BY c.caregiver_id;"
+
 
         result = execute_query(selected_query, intro_line)
         window["RESULT"].update(result)
 
     # Show or hide input field based on selected query
-    if values["Q1"] or values["Q2"]:
+    if values["Q1"] or values["Q2"] or values["Q8"]:
         window["INPUT"].update(visible=True)
         window["INPUT"].update(value="")
     elif values["Q3"]:
