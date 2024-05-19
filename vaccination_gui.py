@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 # Database connection details
 host_name = "localhost"
 user_name = "root"
-user_password = "" # enter password for MySQLWorkbench
+user_password = "7543XDBxcy" # enter password for MySQLWorkbench
 # Create a MySQL connection
 connection = mysql.connector.connect(
             host=host_name,
@@ -31,6 +31,8 @@ layout = [
             [sg.Radio("Show upcoming vaccination appointments by date", "QUERY", key="Q7", enable_events=True)],
             [sg.Radio("Find the total number of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q8", enable_events=True)],
             [sg.Radio("Find the total number of different types of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q9", enable_events=True)],
+            [sg.Radio("Find all vaccines manufactured by a company that are currently out of stock at pharmacies", "QUERY", key="Q10", enable_events=True)],
+            [sg.Radio("Find upcoming vaccination appointments that have is scheduled by the patient", "QUERY", key="Q11", enable_events=True)],
             [sg.Text("Enter additional input if required in `<...>`:")],
             [sg.InputText(key="INPUT", size=(30, 1))],
             [sg.Button("Run Query"), sg.Button("Exit")]
@@ -133,8 +135,56 @@ while True:
                              "FROM Caregivers c " \
                              "JOIN VaccinationRecords vr ON c.caregiver_id = vr.caregiver_id " \
                              "GROUP BY c.caregiver_id;"
-
-
+                             
+        elif values["Q10"]:
+            parts = input_value.split(maxsplit=1)
+            company_name = parts[0]
+            pharmacy_name = parts[1]
+            print(company_name)
+            print(pharmacy_name)
+            intro_line = "Retrieve a list of all vaccines manufactured by a company that are currently out of stock at pharmacies: \n [VaccineName, CompanyName, PharmacyName]\n"
+            selected_query = f"""
+                            SELECT 
+                                v.name AS VaccineName,
+                                c.name AS CompanyName,
+                                p.name AS PharmacyName
+                            FROM 
+                                Vaccinations v
+                            JOIN 
+                                Companies c ON v.company_id = c.company_id
+                            JOIN 
+                                Inventory i ON v.vaccine_id = i.vaccine_id
+                            JOIN 
+                                Pharmacies p ON i.pharmacy_id = p.pharmacy_id
+                            WHERE
+                                i.quantity_available < i.quantity_administered
+                                AND p.name = '{pharmacy_name}'
+                                AND c.name = '{company_name}';
+                            """
+        elif values["Q11"]:
+            first_name = input_value.split(' ')[0]
+            last_name = input_value.split(' ')[1]
+            intro_line = f"Scheduled appointment for patient {input_value}: \n[vaccine, appointment_date, pharmacy_name]\n"
+            selected_query =f"""
+                            SELECT 
+                                v.name AS VaccineName,
+                                a.appointment_date AS AppointmentDate,
+                                ph.name AS PharmacyName
+                            FROM 
+                                VaccinationAppointments a
+                            JOIN 
+                                Vaccinations v ON a.vaccine_id = v.vaccine_id
+                            JOIN 
+                                Caregivers c ON a.caregiver_id = c.caregiver_id
+                            JOIN 
+                                Pharmacies ph ON c.pharmacy_id = ph.pharmacy_id
+                            JOIN 
+                                Patients p ON a.patient_id = p.patient_id
+                            WHERE 
+                                a.status = 1
+                                AND p.first_name = '{first_name}'
+                                AND p.last_name = '{last_name}';
+                            """
         result = execute_query(selected_query, intro_line)
         window["RESULT"].update(result)
 
