@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 # Database connection details
 host_name = "localhost"
 user_name = "root"
-user_password = "Liyijie0417!" # enter password for MySQLWorkbench
+user_password = "!" # enter password for MySQLWorkbench
 # Create a MySQL connection
 connection = mysql.connector.connect(
             host=host_name,
