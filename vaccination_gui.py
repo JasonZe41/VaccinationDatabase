@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 # Database connection details
 host_name = "localhost"
 user_name = "root"
-user_password = "!" # enter password for MySQLWorkbench
+user_password = "7543XDBxcy" # enter password for MySQLWorkbench
 # Create a MySQL connection
 connection = mysql.connector.connect(
             host=host_name,
@@ -31,7 +31,7 @@ layout = [
             [sg.Radio("Show upcoming vaccination appointments by date", "QUERY", key="Q7", enable_events=True)],
             [sg.Radio("Find the total number of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q8", enable_events=True)],
             [sg.Radio("Find the total number of different types of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q9", enable_events=True)],
-            [sg.Radio("Find all vaccines from a <company name> that are out of stock at a <pharmacy name>", "QUERY", key="Q10", enable_events=True)],
+            [sg.Radio("Find all vaccines from a <company name> that are out of stock at pharmacies", "QUERY", key="Q10", enable_events=True)],
             [sg.Radio("Find upcoming vaccination appointments that have is scheduled by the <patient name>", "QUERY", key="Q11", enable_events=True)],
             [sg.Radio("Find the dose amount of each vaccination has been used by all patients", "QUERY", key="Q12", enable_events=True)],
             [sg.Text("Enter additional input if required in `<...>`:")],
@@ -138,21 +138,16 @@ while True:
                              "GROUP BY c.caregiver_id;"
                              
         elif values["Q10"]:
-            parts = input_value.split(maxsplit=1)
-            company_name = parts[0]
-            pharmacy_name = parts[1]
-            print(company_name)
-            print(pharmacy_name)
-            intro_line = "Retrieve a list of all vaccines manufactured by a company that are currently out of stock at pharmacies: \n [VaccineName, CompanyName, PharmacyName]\n"
+            company_name = input_value
+            intro_line = "Retrieve a list of all vaccines manufactured by a company that are currently out of stock at pharmacies: \n [VaccineName, PharmacyName]\n"
             selected_query = f"""
-                            SELECT v.name AS VaccineName, c.name AS CompanyName, p.name AS PharmacyName
+                            SELECT v.name AS VaccineName, p.name AS PharmacyName
                             FROM Vaccinations v
                             JOIN Inventory i ON v.vaccine_id = i.vaccine_id
                             JOIN Companies c ON i.company_id = c.company_id
                             JOIN Pharmacies p ON i.pharmacy_id = p.pharmacy_id
                             WHERE
                                 i.quantity_available < i.quantity_administered
-                                AND p.name = '{pharmacy_name}'
                                 AND c.name = '{company_name}';
                             """
         elif values["Q11"]:
