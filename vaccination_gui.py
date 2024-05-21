@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 # Database connection details
 host_name = "localhost"
 user_name = "root"
-user_password = "7543XDBxcy" # enter password for MySQLWorkbench
+user_password = "Liyijie0417!" # enter password for MySQLWorkbench
 # Create a MySQL connection
 connection = mysql.connector.connect(
             host=host_name,
@@ -26,7 +26,7 @@ layout = [
             [sg.Radio("Find all patients who have received <vaccine name>", "QUERY", key="Q1", enable_events=True)],
             [sg.Radio("Retrieve vaccination history for <patient name>", "QUERY", key="Q2", enable_events=True)],
             [sg.Radio("Find patients due for their 2nd dose or booster shot of a vaccine", "QUERY", key="Q3", enable_events=True)],
-            [sg.Radio("List all vaccines that require ultra-cold storage", "QUERY", key="Q5", enable_events=True)],
+            #[sg.Radio("List all vaccines that require ultra-cold storage", "QUERY", key="Q5", enable_events=True)],
             [sg.Radio("Determine the quantity of vaccines needed to reorder for each pharmacy", "QUERY", key="Q6", enable_events=True)],
             [sg.Radio("Show upcoming vaccination appointments by date", "QUERY", key="Q7", enable_events=True)],
             [sg.Radio("Find the total number of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q8", enable_events=True)],
@@ -101,9 +101,9 @@ while True:
                 " GROUP BY p.patient_id, vr.vaccine_id, v.doses_required " \
                 " HAVING COUNT(vr.record_id) < v.doses_required;"
         
-        elif values["Q5"]:
-            intro_line = "List of vaccines that require ultra-cold storage: \n"
-            selected_query = "SELECT name FROM Vaccinations WHERE storage_requirements = 'Ultra-cold';"
+        # elif values["Q5"]:
+        #     intro_line = "List of vaccines that require ultra-cold storage: \n"
+        #     selected_query = "SELECT name FROM Vaccinations WHERE storage_requirements = 'Ultra-cold';"
 
         elif values["Q6"]:
             intro_line = "Quantity of vaccines needed to reorder for each pharmacy: \n [Pharmacy, Vaccine, QuantityAvailable, QuantityAdministered]\n"
@@ -183,10 +183,10 @@ while True:
         window["RESULT"].update(result)
 
     # Show or hide input field based on selected query
-    if values["Q1"] or values["Q2"] or values["Q8"]:
+    if values["Q1"] or values["Q2"] or values["Q10"] or values["Q11"]:
         window["INPUT"].update(visible=True)
         window["INPUT"].update(value="")
-    elif values["Q3"]:
+    elif values["Q3"] or values["Q6"] or values["Q7"] or values["Q8"] or values["Q9"] or values["Q12"]:
         window["INPUT"].update(visible=False)
         window["INPUT"].update(value="")
 

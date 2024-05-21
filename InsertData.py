@@ -122,11 +122,9 @@ vaccinations_table = """
 CREATE TABLE IF NOT EXISTS Vaccinations (
     vaccine_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
-    company_id INT,
     type VARCHAR(255),
     doses_required INT,
-    storage_requirements VARCHAR(255),
-    FOREIGN KEY (company_id) REFERENCES Companies(company_id)
+    storage_requirements VARCHAR(255)
 );
 """
 execute_query(connection, vaccinations_table)
@@ -196,7 +194,7 @@ insert_data_from_csv(connection, 'Caregivers', './data/caregiver.csv',
                      ['caregiver_id', 'first_name', 'last_name', 'email', 'phone', 'street_address', 'address2', 'available_time_slot', 'pharmacy_id'])
 
 insert_data_from_csv(connection, 'Vaccinations', './data/vaccination.csv',
-                     ['vaccine_id', 'name', 'company_id', 'type', 'doses_required', 'storage_requirements'])
+                     ['vaccine_id', 'name', 'type', 'doses_required', 'storage_requirements'])
 
 insert_data_from_csv(connection, 'Inventory', './data/inventory.csv',
                      ['pharmacy_id', 'company_id', 'vaccine_id', 'quantity_available', 'quantity_administered'])
