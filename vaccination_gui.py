@@ -31,8 +31,9 @@ layout = [
             [sg.Radio("Show upcoming vaccination appointments by date", "QUERY", key="Q7", enable_events=True)],
             [sg.Radio("Find the total number of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q8", enable_events=True)],
             [sg.Radio("Find the total number of different types of vaccines administered by each Vaccination Caregiver", "QUERY", key="Q9", enable_events=True)],
-            [sg.Radio("Find all vaccines manufactured by a company that are currently out of stock at pharmacies", "QUERY", key="Q10", enable_events=True)],
-            [sg.Radio("Find upcoming vaccination appointments that have is scheduled by the patient", "QUERY", key="Q11", enable_events=True)],
+            [sg.Radio("Find all vaccines from a <company name> that are out of stock at a <pharmacy name>", "QUERY", key="Q10", enable_events=True)],
+            [sg.Radio("Find upcoming vaccination appointments that have is scheduled by the <patient name>", "QUERY", key="Q11", enable_events=True)],
+            [sg.Radio("Find the dose amount of each vaccination has been used by all patients", "QUERY", key="Q12", enable_events=True)],
             [sg.Text("Enter additional input if required in `<...>`:")],
             [sg.InputText(key="INPUT", size=(30, 1))],
             [sg.Button("Run Query"), sg.Button("Exit")]
@@ -144,18 +145,11 @@ while True:
             print(pharmacy_name)
             intro_line = "Retrieve a list of all vaccines manufactured by a company that are currently out of stock at pharmacies: \n [VaccineName, CompanyName, PharmacyName]\n"
             selected_query = f"""
-                            SELECT 
-                                v.name AS VaccineName,
-                                c.name AS CompanyName,
-                                p.name AS PharmacyName
-                            FROM 
-                                Vaccinations v
-                            JOIN 
-                                Companies c ON v.company_id = c.company_id
-                            JOIN 
-                                Inventory i ON v.vaccine_id = i.vaccine_id
-                            JOIN 
-                                Pharmacies p ON i.pharmacy_id = p.pharmacy_id
+                            SELECT v.name AS VaccineName, c.name AS CompanyName, p.name AS PharmacyName
+                            FROM Vaccinations v
+                            JOIN Inventory i ON v.vaccine_id = i.vaccine_id
+                            JOIN Companies c ON i.company_id = c.company_id
+                            JOIN Pharmacies p ON i.pharmacy_id = p.pharmacy_id
                             WHERE
                                 i.quantity_available < i.quantity_administered
                                 AND p.name = '{pharmacy_name}'
@@ -166,24 +160,24 @@ while True:
             last_name = input_value.split(' ')[1]
             intro_line = f"Scheduled appointment for patient {input_value}: \n[vaccine, appointment_date, pharmacy_name]\n"
             selected_query =f"""
-                            SELECT 
-                                v.name AS VaccineName,
-                                a.appointment_date AS AppointmentDate,
-                                ph.name AS PharmacyName
-                            FROM 
-                                VaccinationAppointments a
-                            JOIN 
-                                Vaccinations v ON a.vaccine_id = v.vaccine_id
-                            JOIN 
-                                Caregivers c ON a.caregiver_id = c.caregiver_id
-                            JOIN 
-                                Pharmacies ph ON c.pharmacy_id = ph.pharmacy_id
-                            JOIN 
-                                Patients p ON a.patient_id = p.patient_id
+                            SELECT v.name AS VaccineName, a.appointment_date AS AppointmentDate, ph.name AS PharmacyName
+                            FROM VaccinationAppointments a
+                            JOIN Vaccinations v ON a.vaccine_id = v.vaccine_id
+                            JOIN Caregivers c ON a.caregiver_id = c.caregiver_id
+                            JOIN Pharmacies ph ON c.pharmacy_id = ph.pharmacy_id
+                            JOIN Patients p ON a.patient_id = p.patient_id
                             WHERE 
                                 a.status = 1
                                 AND p.first_name = '{first_name}'
                                 AND p.last_name = '{last_name}';
+                            """
+        elif values["Q12"]:
+            intro_line = f"The amount of each vaccination has been used: \n[vaccine, appointment_date, pharmacy_name]\n"
+            selected_query =f"""
+                            SELECT v.name AS VaccineName, SUM(vr.dose_number) AS TotalDosesAdministered
+                            FROM VaccinationRecords vr
+                            JOIN Vaccinations v ON vr.vaccine_id = v.vaccine_id
+                            GROUP BY v.name;
                             """
         result = execute_query(selected_query, intro_line)
         window["RESULT"].update(result)
